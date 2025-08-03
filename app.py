@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from online_restaurant_db import Base, engine, Session, User, Menu, Orders, Reservation
-from flask_login import LoginManager, UserMixin, current_user
-from django.contrib.auth.decorators import login_required
+from flask_login import LoginManager, UserMixin, current_user, login_required
 import datetime
 import secrets
 
