@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product['name'] if product else 'Кошик' }}</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .image-box img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #1e2a53;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            color: #444;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .add {
+            background-color: #28a745;
+            color: white;
+        }
+        .add:hover {
+            background-color: #218838;
+        }
+        .cart-item {
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .cart-info {
+            flex: 1;
+        }
+        .cart-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type=number] {
+            width: 60px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        .flash {
+            color: green;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .delete-link {
+            color: red;
+            text-decoration: none;
+        }
+        .delete-link:hover {
+            text-decoration: underline;
+        }
+        .back-link {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .back-link a {
+            text-decoration: none;
+            color: #3366cc;
+            font-weight: bold;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        {% if product %}
+        <div class="image-box">
+            <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+        </div>
+        <h2>{{ product['name'] }}</h2>
+        <p><strong>Інгредієнти:</strong> {{ product['description'] }}</p>
+        <p><strong>Ціна:</strong> {{ product['price'] }} грн</p>
+
+        <div style="text-align:center; margin-bottom: 30px;">
+            <a href="{{ url_for('add_to_cart', product_id=product['id']) }}">
+                <button class="btn add">Додати до кошика</button>
+            </a>
+        </div>
+        {% endif %}
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash">
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <h2>Ваш кошик</h2>
+        {% if cart %}
+            {% for product_id, item in cart.items() %}
+                <div class="cart-item">
+                    <div class="cart-info">
+                        <strong>{{ item.name }}</strong><br>
+                        {{ item.price }} грн × {{ item.quantity }}
+                    </div>
+                    <div class="cart-actions">
+                        <form action="{{ url_for('update_cart', product_id=product_id) }}" method="POST">
+                            <input type="number" name="quantity" min="1" max="10" value="{{ item.quantity }}">
+                            <button type="submit">Оновити</button>
+                        </form>
+                        <a class="delete-link" href="{{ url_for('delete_from_cart', product_id=product_id) }}">Видалити</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center;">Кошик порожній.</p>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="{{ url_for('menu') }}">← Назад до меню</a>
+        </div>
+    </div>
+</body>
+</html>

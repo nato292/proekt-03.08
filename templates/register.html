@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Реєстрація</title>
+    <style>
+        body {
+            background: #f5f6fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            color: #273c75;
+        }
+        form {
+            background: #fff;
+            max-width: 350px;
+            margin: 40px auto;
+            padding: 30px 25px 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(44, 62, 80, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            padding: 10px 12px;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border: 1.5px solid #4078c0;
+            outline: none;
+        }
+        button[type="submit"] {
+            background: #4078c0;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 0;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background: #274b7a;
+        }
+    </style>
+</head>
+<body>
+    <h2>Реєстрація</h2>
+    <form method="post">
+        <input type="text" name="username" placeholder="Ім'я користувача">
+        <input type="email" name="email" placeholder="Email" >
+        <input type="password" name="password" placeholder="Пароль" >
+        <button type="submit">Зареєструватися</button>
+    </form>
+</body>
+</html>
