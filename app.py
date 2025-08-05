@@ -41,8 +41,6 @@ def apply_csp(response):
     return response
 
 @app.route('/')
-def index():
-    return "<h1>Головна сторінка ресторану</h1> <a href='/submit_order'>Зробити замовлення</a>"
 @app.route('/home')
 def home():
     if "csrf_token" not in session:
