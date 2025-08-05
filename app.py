@@ -306,15 +306,6 @@ def reservations_check():
         all_reservations = cursor.query(Reservation).all()
         return render_template('reservations_check.html', all_reservations=all_reservations, csrf_token=session["csrf_token"])
     
-@app.route('/all_users')
-@login_required
-def all_users():
-    if current_user.nickname != 'Admin':
-        return redirect(url_for('home'))
-
-    with Session() as cursor:
-        all_users = cursor.query(User).with_entities(User.id, User.nickname, User.email).all()
-    return render_template('all_users.html', all_users=all_users)
 
 @app.route('/menu_check', methods=['GET', 'POST'])
 @login_required
