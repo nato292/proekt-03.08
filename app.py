@@ -41,6 +41,8 @@ def apply_csp(response):
     return response
 
 @app.route('/')
+def index():
+    return "<h1>Головна сторінка ресторану</h1> <a href='/submit_order'>Зробити замовлення</a>"
 @app.route('/home')
 def home():
     if "csrf_token" not in session:
@@ -209,6 +211,7 @@ def delete_from_cart(product_id):
     session.modified = True
     return redirect(url_for("cart"))
 
+
 @app.route('/create_order', methods=['GET','POST'])
 def create_order():
     cart = session.get('cart')
@@ -232,6 +235,21 @@ def create_order():
                     return redirect(f"/my_order/{new_order.id}")
 
     return render_template('create_order.html', csrf_token=session["csrf_token"], cart=cart)
+
+
+@app.route('/submit_order', methods=['GET', 'POST'])
+def submit_order():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        dish = request.form.get('dish')
+        quantity = request.form.get('quantity')
+        
+        flash(f"Дякуємо, {name}! Ваше замовлення на {quantity}x {dish} прийнято!")
+        return redirect(url_for('submit_order'))
+
+    return render_template('submit_order.html')
+
 
 @app.route('/my_orders')
 @login_required
