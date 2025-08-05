@@ -234,6 +234,15 @@ def create_order():
 
     return render_template('create_order.html', csrf_token=session["csrf_token"], cart=cart)
 
+@app.route('/all_users')
+@login_required
+def all_users():
+    if current_user.nickname != 'Admin':
+        return redirect(url_for('home'))
+
+    with Session() as cursor:
+        all_users = cursor.query(User).with_entities(User.id, User.nickname, User.email).all()
+    return render_template('all_users.html', all_users=all_users)
 
 @app.route('/submit_order', methods=['GET', 'POST'])
 def submit_order():
