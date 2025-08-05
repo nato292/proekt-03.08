@@ -244,7 +244,6 @@ def submit_order():
         phone = request.form.get('phone')
         dish = request.form.get('dish')
         quantity = request.form.get('quantity')
-        
         flash(f"Дякуємо, {name}! Ваше замовлення на {quantity}x {dish} прийнято!")
         return redirect(url_for('submit_order'))
 
