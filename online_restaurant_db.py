@@ -27,15 +27,15 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(100), unique=True)
 
 class Menu(Base):
-    __tablename__ = "menu"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String)
-    weight: Mapped[str] = mapped_column(String)
-    ingredients : Mapped[str] = mapped_column(String)
-    description: Mapped[str] = mapped_column(String)
-    price: Mapped[int] = mapped_column()
-    active: Mapped[bool] = mapped_column(Boolean, default=True)
-    file_name: Mapped[str] = mapped_column(String)
+    __tablename__ = 'menu'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    weight = Column(String)
+    ingredients = Column(String)
+    description = Column(String)
+    price = Column(Float)
+    file_name = Column(String)
+    active = Column(Boolean, default=True)
 
 class Orders(Base):
     __tablename__ = "orders"
