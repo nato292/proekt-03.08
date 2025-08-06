@@ -148,11 +148,9 @@ def add_to_cart(product_id):
             flash("Товар не найден!", "error")
             return redirect(url_for('menu'))
 
-        # Инициализируем корзину, если её нет
         if 'cart' not in session:
             session['cart'] = []
 
-        # Проверяем, есть ли уже этот товар в корзине
         cart = session['cart']
         for item in cart:
             if item['id'] == product.id:
