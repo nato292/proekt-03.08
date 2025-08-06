@@ -90,9 +90,33 @@ def login():
 
 @app.route('/menu')
 def menu():
- with Session() as session:
-        all_positions = session.query(Menu).filter_by(active = True).all()
-        return render_template('menu.html',all_positions = all_positions)
+    with Session() as session:
+        products = session.query(Menu).filter_by(active=True).all()
+        
+        if not products:
+            products = [
+                {
+                    'id': 1,
+                    'name': 'Голубці',
+                    'description': 'Традиційна українська страва з капустяного листя з начинкою з м’яса та рису, тушкована в томатному соусі.',
+                    'image_url': url_for('static', filename='menu/Golubchi.png')
+                },
+                {
+                    'id': 2,
+                    'name': 'Борщ',
+                    'description': 'Український національний суп на основі буряка з м’ясом і овочами.',
+                    'image_url': url_for('static', filename='menu/Borsh.png')
+                },
+                {
+                    'id': 3,
+                    'name': 'Вареники',
+                    'description': 'Традиційна українська страва з тіста з начинкою з картоплі.',
+                    'image_url': url_for('static', filename='menu/Vareniki.png')
+                },
+            ]
+    return render_template('menu.html', products=products)
+
+
 
 @app.route('/position/<int:id>')
 def position(id):
