@@ -51,7 +51,7 @@ class Reservation(Base):
     time: Mapped[str] = mapped_column(String(50))
     user = relationship("User")
 
-# Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
 
 base = Base()
 base.create_db()
