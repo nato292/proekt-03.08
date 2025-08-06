@@ -29,12 +29,13 @@ class User(Base):
 class Menu(Base):
     __tablename__ = "menu"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(100))
-    description: Mapped[str] = mapped_column(String(255))
-    ingredients: Mapped[str] = mapped_column(String(255))
-    price: Mapped[float] = mapped_column()
-    weight: Mapped[int] = mapped_column()
-    image_url: Mapped[str] = mapped_column(String(255))
+    name: Mapped[str] = mapped_column(String)
+    weight: Mapped[str] = mapped_column(String)
+    ingredients : Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(String)
+    price: Mapped[int] = mapped_column()
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    file_name: Mapped[str] = mapped_column(String)
 
 class Orders(Base):
     __tablename__ = "orders"
@@ -51,8 +52,8 @@ class Reservation(Base):
     time: Mapped[str] = mapped_column(String(50))
     user = relationship("User")
 
-Base.metadata.drop_all(engine)
-Base.metadata.create_all(engine)
+# Base.metadata.drop_all(engine)
+# Base.metadata.create_all(engine)
 
 base = Base()
 base.create_db()
