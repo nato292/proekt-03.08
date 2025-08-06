@@ -88,65 +88,35 @@ def login():
         return "Невірні дані"
     return render_template("login.html")
 
+
 @app.route('/menu')
 def menu():
     with Session() as session:
-        products = session.query(Menu).filter_by(active=True).all()
-        
-        if not products:
-            products = [
-                {
-                    'id': 1,
-                    'name': 'Голубці',
-                    'description': 'Традиційна українська страва з капустяного листя з начинкою з м’яса та рису, тушкована в томатному соусі.',
-                    'image_url': url_for('static', filename='menu/Golubchi.png')
-                },
-                {
-                    'id': 2,
-                    'name': 'Борщ',
-                    'description': 'Український національний суп на основі буряка з м’ясом і овочами.',
-                    'image_url': url_for('static', filename='menu/Borsh.png')
-                },
-                {
-                    'id': 3,
-                    'name': 'Вареники',
-                    'description': 'Традиційна українська страва з тіста з начинкою з картоплі.',
-                    'image_url': url_for('static', filename='menu/Vareniki.png')
-                },
-            ]
-    return render_template('menu.html', products=products)
+        all_positions = session.query(Menu).filter_by(active = True).all()
+    return render_template('menu.html',all_positions = all_positions)
 
 
+@app.route('/position/<name>', methods = ['GET','POST'])
+def position(name):
+    if request.method == 'POST':
 
-@app.route('/position/<int:id>')
-def position(id):
-    init_cart()
-    products = {
-        1: {
-            'name': 'Голубці',
-            'description': 'капустяне листя, свинячий або яловичий фарш, рис, морква, цибуля, сіль, перець, томатна паста, лавровий лист, соняшникова олія, сметана, часник, зелень',
-            'price': 110,
-            'image_url': url_for('static', filename='menu/Golubchi.png')
-        },
-        2: {
-            'name': 'Борщ',
-            'description': 'буряк, капуста, картопля, морква, цибуля, томатна паста, часник, лавровий лист, сіль, перець, свинячі або яловичі ребра, соняшникова олія, зелень, оцет, цукор, сметана',
-            'price': 150,
-            'image_url': url_for('static', filename='menu/Borsh.png')
-        },
-        3: {
-            'name': 'Вареники',
-            'description': 'борошно, вода, сіль, яйце, картопля, смажена цибуля, вершкове масло, чорний перець, сметана',
-            'price': 130,
-            'image_url': url_for('static', filename='menu/Vareniki.png')
-        },
-    }
-    product = products.get(id)
-    if not product:
-        return "Страва не знайдена", 404
-    
-    product['id'] = id 
-    return render_template('position.html', product=product, cart=session["cart"])
+        if request.form.get("csrf_token") != session["csrf_token"]:
+            return "Запит заблоковано!", 403
+
+        position_name = request.form.get('name')
+        position_num = request.form.get('num')
+        if 'cart' not in session:
+            cart = {}
+            cart[position_name] = position_num
+            session['cart'] = cart
+        else:
+            cart = session.get('cart')
+            cart[position_name] = position_num
+            session['cart'] = cart
+        flash('Позицію додано у кошик!')
+    with Session() as cursor:
+        us_position = cursor.query(Menu).filter_by(active = True, name = name).first()
+    return render_template('position.html', csrf_token=session["csrf_token"] ,position = us_position)
 
 @app.route("/my_order/<int:id>")
 @login_required
