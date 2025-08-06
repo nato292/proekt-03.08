@@ -140,36 +140,35 @@ def update_cart(product_id):
     return redirect(url_for("cart"))
 
 
-@app.route("/add_to_cart/<int:product_id>")
+@app.route('/add_to_cart/<int:product_id>')
 def add_to_cart(product_id):
-    init_cart()
+    with Session() as db:
+        product = db.query(Menu).get(product_id)
+        if not product:
+            flash("Товар не найден!", "error")
+            return redirect(url_for('menu'))
 
-    products = {
-        1: {'name': 'Голубці', 'price': 110},
-        2: {'name': 'Борщ', 'price': 150},
-        3: {'name': 'Вареники', 'price': 130},
-    }
+        # Инициализируем корзину, если её нет
+        if 'cart' not in session:
+            session['cart'] = []
 
-    product = products.get(product_id)
-    if not product:
-        return "Продукт не знайдено", 404
+        # Проверяем, есть ли уже этот товар в корзине
+        cart = session['cart']
+        for item in cart:
+            if item['id'] == product.id:
+                item['quantity'] += 1
+                break
+        else:
+            cart.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'quantity': 1
+            })
 
-    str_id = str(product_id)
-
-    if str_id in session["cart"]:
-        if session["cart"][str_id]["quantity"] < 10:
-            session["cart"][str_id]["quantity"] += 1
-    else:
-        session["cart"][str_id] = {
-            "name": product["name"],
-            "price": product["price"],
-            "quantity": 1
-        }
-
-    session.modified = True
-    flash("Товар додано в кошик")
-    return redirect(url_for("cart"))
-
+        session['cart'] = cart
+        flash(f"{product.name} добавлено в корзину!", "success")
+        return redirect(url_for('menu'))
 
 @app.route("/cart/delete/<product_id>")
 def delete_from_cart(product_id):
