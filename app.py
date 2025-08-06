@@ -123,6 +123,7 @@ def menu():
     ]
     return render_template('menu.html', products=products)
 
+
 @app.route('/position/<int:id>')
 def position(id):
     init_cart()
@@ -152,14 +153,6 @@ def position(id):
     
     product['id'] = id 
     return render_template('position.html', product=product, cart=session["cart"])
-
-@app.route("/my_order/<int:id>")
-@login_required
-def my_order(id):
-    with Session() as cursor:
-        us_order = cursor.query(Orders).filter_by(id=id).first()
-        total_price = sum(int(cursor.query(Menu).filter_by(name=i).first().price) * int(cnt) for i, cnt in us_order.order_list.items())
-    return render_template('my_order.html', order=us_order, total_price=total_price)
 
 
 @app.route("/cart")
