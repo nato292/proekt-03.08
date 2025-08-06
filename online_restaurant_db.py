@@ -34,7 +34,6 @@ class Menu(Base):
     ingredients = Column(String)
     description = Column(String)
     price = Column(Float)
-    file_name = Column(String)
     active = Column(Boolean, default=True)
 
 class Orders(Base):
