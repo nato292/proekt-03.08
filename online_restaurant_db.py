@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, String, Float, Integer, ForeignKey, Boolean, Text, DateTime
+from sqlalchemy import create_engine, String, Float, Integer, ForeignKey, Boolean, Text, DateTime, Column, Integer, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship, sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.dialects.postgresql import JSONB
@@ -35,6 +35,7 @@ class Menu(Base):
     price: Mapped[float] = mapped_column()
     weight: Mapped[int] = mapped_column()
     image_url: Mapped[str] = mapped_column(String(255))
+    active = Column(Boolean, default=True)
 
 class Orders(Base):
     __tablename__ = "orders"
