@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Адміністрування замовлень</title>
+</head>
+<body>
+<h2>Перевірка замовлень</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Користувач</th>
+        <th>Список замовлення</th>
+        <th>Час</th>
+        <th>Статус</th>
+        <th>Дія</th>
+    </tr>
+    {% for order in all_orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.user_id }}</td>
+        <td>
+            <ul>
+            {% for name, qty in order.order_list.items() %}
+                <li>{{ name }}: {{ qty }}</li>
+            {% endfor %}
+            </ul>
+        </td>
+        <td>{{ order.order_time }}</td>
+        <td>{{ "Виконано" if order.status else "Очікує" }}</td>
+        <td>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="order_id" value="{{ order.id }}">
+                <button type="submit" name="delete_order" onclick="return confirm('Видалити замовлення?');">Видалити</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

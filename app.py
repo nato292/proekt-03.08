@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from online_restaurant_db import Base, engine, Session, User, Menu, Orders, Reservation
-from flask_login import LoginManager, UserMixin, current_user, login_required
+from flask_login import LoginManager, current_user, login_required, login_user
 import datetime
 import secrets
+import os
 
 app = Flask(__name__)
 
@@ -54,39 +55,49 @@ def init_cart():
         session["cart"] = {}
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route("/register", methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        session_db = Session()
-        username = request.form['username']
-        password = request.form['password']
+        if request.form.get("csrf_token") != session["csrf_token"]:
+            return "Запит заблоковано!", 403
+
+        nickname = request.form['nickname']
         email = request.form['email']
+        password = request.form['password']
 
-        if session_db.query(User).filter_by(username=username).first():
-            return "Користувач вже існує"
-        if session_db.query(User).filter_by(email=email).first():
-            return "Пошта вже використовується"
+        with Session() as cursor:
+            if cursor.query(User).filter((User.email==email) | (User.nickname==nickname)).first():
+                flash('Користувач з таким email або нікнеймом вже існує!', 'danger')
+                return render_template('register.html', csrf_token=session["csrf_token"])
 
-        new_user = User(username=username, password=password, email=email)
-        session_db.add(new_user)
-        session_db.commit()
-        return redirect(url_for('login'))
+            new_user = User(nickname=nickname, email=email)
+            new_user.set_password(password)
+            cursor.add(new_user)
+            cursor.commit()
+            cursor.refresh(new_user)
+            login_user(new_user)
+            return redirect(url_for('home'))
 
-    return render_template("register.html")
+    return render_template('register.html', csrf_token=session["csrf_token"])
 
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == 'POST':
-        session_db = Session()
-        username = request.form['username']
+        if request.form.get("csrf_token") != session["csrf_token"]:
+            return "Запит заблоковано!", 403
+
+        nickname = request.form['nickname']
         password = request.form['password']
-        user = session_db.query(User).filter_by(username=username, password=password).first()
-        if user:
-            session['user_id'] = user.id
-            return redirect(url_for('home'))
-        return "Невірні дані"
-    return render_template("login.html")
+
+        with Session() as cursor:
+            user = cursor.query(User).filter_by(nickname=nickname).first()
+            if user and user.check_password(password):
+                login_user(user)
+                return redirect(url_for('home'))
+
+            flash('Неправильний nickname або пароль!', 'danger')
+
+    return render_template('login.html', csrf_token=session["csrf_token"])
 
 @app.route('/menu')
 def menu():
@@ -150,6 +161,28 @@ def my_order(id):
         total_price = sum(int(cursor.query(Menu).filter_by(name=i).first().price) * int(cnt) for i, cnt in us_order.order_list.items())
     return render_template('my_order.html', order=us_order, total_price=total_price)
 
+
+@app.route("/cart")
+def cart():
+    init_cart()
+    return render_template("position.html", product=None, cart=session["cart"])
+
+@app.route("/cart/update/<product_id>", methods=["POST"])
+def update_cart(product_id):
+    init_cart()
+    quantity = int(request.form.get("quantity", 1))
+
+    if quantity < 1 or quantity > 10:
+        flash("Кількість повинна бути від 1 до 10")
+    else:
+        if product_id in session["cart"]:
+            session["cart"][product_id]["quantity"] = quantity
+            flash("Кількість оновлено")
+
+    session.modified = True
+    return redirect(url_for("cart"))
+
+
 @app.route("/add_to_cart/<int:product_id>")
 def add_to_cart(product_id):
     init_cart()
@@ -178,26 +211,6 @@ def add_to_cart(product_id):
 
     session.modified = True
     flash("Товар додано в кошик")
-    return redirect(url_for("cart"))
-
-@app.route("/cart")
-def cart():
-    init_cart()
-    return render_template("position.html", product=None, cart=session["cart"])
-
-@app.route("/cart/update/<product_id>", methods=["POST"])
-def update_cart(product_id):
-    init_cart()
-    quantity = int(request.form.get("quantity", 1))
-
-    if quantity < 1 or quantity > 10:
-        flash("Кількість повинна бути від 1 до 10")
-    else:
-        if product_id in session["cart"]:
-            session["cart"][product_id]["quantity"] = quantity
-            flash("Кількість оновлено")
-
-    session.modified = True
     return redirect(url_for("cart"))
 
 
@@ -234,6 +247,84 @@ def create_order():
 
     return render_template('create_order.html', csrf_token=session["csrf_token"], cart=cart)
 
+
+@app.route('/my_orders')
+@login_required
+def my_orders():
+    with Session() as cursor:
+        us_orders = cursor.query(Orders).filter_by(user_id=current_user.id).all()
+    return render_template('my_orders.html', us_orders=us_orders)
+
+@app.route("/my_order/<int:id>")
+@login_required
+def my_order(id):
+    with Session() as cursor:
+        us_order = cursor.query(Orders).filter_by(id=id).first()
+        total_price = sum(int(cursor.query(Menu).filter_by(name=i).first().price) * int(cnt) for i, cnt in us_order.order_list.items())
+    return render_template('my_order.html', order=us_order, total_price=total_price)
+
+
+############################### ADMINKA
+
+@app.route('/add_menu', methods=['GET', 'POST'])
+@login_required
+def add_menu():
+    if current_user.nickname != 'Admin':
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        if request.form.get("csrf_token") != session['csrf_token']:
+            return "Запит заблоковано!", 403
+
+        name = request.form['name']
+        weight = request.form['weight']
+        ingredients = request.form['ingredients']
+        description = request.form['description']
+        price = request.form['price']
+        photo = request.files['photo']
+        photo.save(os.path.join('static/menu', photo.filename))
+        file_name = photo.filename
+        with Session() as cursor:
+            new_dish = Menu(
+                name=name,
+                weight=weight,
+                ingredients=ingredients,
+                description=description,
+                price=int(price),
+                active=True,
+                file_name=file_name
+            )
+            cursor.add(new_dish)
+            cursor.commit()
+        return redirect(url_for('menu_check'))
+
+    return render_template('add_menu.html', csrf_token=session["csrf_token"])
+
+
+@app.route('/menu_check', methods=['GET', 'POST'])
+@login_required
+def menu_check(request):
+    if current_user.username != 'Admin':
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        if request.form.get("csrf_token") != session['csrf_token']:
+            return "Запит заблоковано!", 403
+
+        position_id = request.form['pos_id']
+        with Session() as cursor:
+            position_obj = cursor.query(Menu).filter_by(id=position_id).first()
+            if 'change_status' in request.form:
+                position_obj.active = not position_obj.active
+            elif 'delete_position' in request.form:
+                cursor.delete(position_obj)
+            cursor.commit()
+
+    with Session() as cursor:
+        all_positions = cursor.query(Menu).all()
+    return render_template('check_menu.html', all_positions=all_positions, csrf_token=session["csrf_token"])
+
+
 @app.route('/all_users')
 @login_required
 def all_users():
@@ -244,25 +335,27 @@ def all_users():
         all_users = cursor.query(User).with_entities(User.id, User.nickname, User.email).all()
     return render_template('all_users.html', all_users=all_users)
 
-@app.route('/submit_order', methods=['GET', 'POST'])
-def submit_order():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        phone = request.form.get('phone')
-        dish = request.form.get('dish')
-        quantity = request.form.get('quantity')
-        flash(f"Дякуємо, {name}! Ваше замовлення на {quantity}x {dish} прийнято!")
-        return redirect(url_for('submit_order'))
-
-    return render_template('submit_order.html')
-
-
-@app.route('/my_orders')
+@app.route('/orders_check', methods=['GET', 'POST'])
 @login_required
-def my_orders():
+def orders_check():
+    if current_user.nickname != 'Admin':
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        if request.form.get("csrf_token") != session['csrf_token']:
+            return "Запит заблоковано!", 403
+
+        order_id = request.form['order_id']
+        with Session() as cursor:
+            order_obj = cursor.query(Orders).filter_by(id=order_id).first()
+            
+            if 'delete_order' in request.form:
+                cursor.delete(order_obj)
+            cursor.commit()
+
     with Session() as cursor:
-        us_orders = cursor.query(Orders).filter_by(user_id=current_user.id).all()
-    return render_template('my_orders.html', us_orders=us_orders)
+        all_orders = cursor.query(Orders).all()
+    return render_template('check_orders.html', all_orders=all_orders, csrf_token=session["csrf_token"])
 
 @app.route('/reserved', methods=['GET', 'POST'])
 @login_required
@@ -275,14 +368,13 @@ def reserved():
         table_type = request.form['table_type']
         reserved_time_start = request.form['time']
 
-
         with Session() as cursor:
             reserved_check = cursor.query(Reservation).filter_by(type_table=table_type).count()
             user_reserved_check = cursor.query(Reservation).filter_by(user_id=current_user.id).first()
 
 
             message = f'Бронь на {reserved_time_start} столика на {table_type} людини успішно створено!'
-            if not user_reserved_check:
+            if  not user_reserved_check:
                 new_reserved = Reservation(type_table=table_type, time_start=reserved_time_start, user_id=current_user.id)
                 cursor.add(new_reserved)
                 cursor.commit()
@@ -314,30 +406,7 @@ def reservations_check():
     with Session() as cursor:
         all_reservations = cursor.query(Reservation).all()
         return render_template('reservations_check.html', all_reservations=all_reservations, csrf_token=session["csrf_token"])
-    
 
-@app.route('/menu_check', methods=['GET', 'POST'])
-@login_required
-def menu_check(request):
-    if current_user.username != 'Admin':
-        return redirect(url_for('home'))
-
-    if request.method == 'POST':
-        if request.form.get("csrf_token") != session['csrf_token']:
-            return "Запит заблоковано!", 403
-
-        position_id = request.form['pos_id']
-        with Session() as cursor:
-            position_obj = cursor.query(Menu).filter_by(id=position_id).first()
-            if 'change_status' in request.form:
-                position_obj.active = not position_obj.active
-            elif 'delete_position' in request.form:
-                cursor.delete(position_obj)
-            cursor.commit()
-
-    with Session() as cursor:
-        all_positions = cursor.query(Menu).all()
-    return render_template('check_menu.html', all_positions=all_positions, csrf_token=session["csrf_token"])
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
