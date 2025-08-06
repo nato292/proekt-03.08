@@ -345,7 +345,8 @@ def menu_check(request):
         all_positions = cursor.query(Menu).all()
     return render_template('check_menu.html', all_positions=all_positions, csrf_token=session["csrf_token"])
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+if __name__ == '__main__':
+    app.run(debug=True)
+
 
 
