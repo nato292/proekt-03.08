@@ -71,6 +71,9 @@ class Orders(Base):
 
     user = relationship("Users", foreign_keys="Orders.user_id", back_populates="orders")
 
+# Base.metadata.drop_all(engine)
+# Base.metadata.create_all(engine)
+
 base = Base()
 base.create_db()
 
