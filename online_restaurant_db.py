@@ -14,7 +14,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     PGUSER = "postgres"
     PGPASSWORD = "ilya2012"
-    DATABASE_URL = f"postgresql+psycopg2://{PGUSER}:{PGPASSWORD}@localhost:5432/proekt_db"
+    DATABASE_URL = f"postgresql+psycopg2://{PGUSER}:{PGPASSWORD}@localhost:5432/proekt_sproba"
 
 engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
