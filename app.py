@@ -55,48 +55,39 @@ def init_cart():
         session["cart"] = {}
 
 
-@app.route("/register", methods = ['GET','POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        if request.form.get("csrf_token") != session["csrf_token"]:
-            return "Запит заблоковано!", 403
+        session_db = Session()
         nickname = request.form['nickname']
-        email = request.form['email']
         password = request.form['password']
+        email = request.form['email']
 
-        with Session() as cursor:
-            if cursor.query(Users).filter_by(email=email).first() or cursor.query(Users).filter_by(nickname = nickname).first():
-                flash('Користувач з таким email або нікнеймом вже існує!', 'danger')
-                return render_template('register.html',csrf_token=session["csrf_token"])
+        if session_db.query(Users).filter_by(nickname=nickname).first():
+            return "Користувач вже існує"
+        if session_db.query(Users).filter_by(email=email).first():
+            return "Пошта вже використовується"
 
-            new_user = Users(nickname=nickname, email=email)
-            new_user.set_password(password)
-            cursor.add(new_user)
-            cursor.commit()
-            cursor.refresh(new_user)
-            login_user(new_user)
-            return redirect(url_for('home'))
-    return render_template('register.html',csrf_token=session["csrf_token"])
+        new_user = Users(nickname=nickname, password=password, email=email)
+        session_db.add(new_user)
+        session_db.commit()
+        return redirect(url_for('login'))
+
+    return render_template("register.html")
 
 
-@app.route("/login", methods = ["GET","POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.form.get("csrf_token") != session["csrf_token"]:
-            return "Запит заблоковано!", 403
-
+        session_db = Session()
         nickname = request.form['nickname']
         password = request.form['password']
-
-        with Session() as cursor:
-            user = cursor.query(Users).filter_by(nickname = nickname).first()
-            if user and user.check_password(password):
-                login_user(user)
-                return redirect(url_for('home'))
-
-            flash('Неправильний nickname або пароль!', 'danger')
-
-    return render_template('login.html', csrf_token=session["csrf_token"])
+        user = session_db.query(Users).filter_by(nickname=nickname, password=password).first()
+        if user:
+            session['user_id'] = user.id
+            return redirect(url_for('home'))
+        return "Невірні дані"
+    return render_template("login.html")
 
 
 @app.route('/menu')
