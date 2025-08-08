@@ -13,8 +13,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 # Fallback для локального запуску (опціонально)
 if not DATABASE_URL:
     PGUSER = "postgres"
-    PGPASSWORD = "21022004"
-    DATABASE_URL = f"postgresql+psycopg2://{PGUSER}:{PGPASSWORD}@localhost:5432/restaurant_illia"
+    PGPASSWORD = "ilya2012"
+    DATABASE_URL = f"postgresql+psycopg2://{PGUSER}:{PGPASSWORD}@localhost:5432/proekt_db"
 
 engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
