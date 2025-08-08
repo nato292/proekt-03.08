@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>{{ product['name'] if product else 'Кошик' }}</title>
+    <title>{{ position['name'] if position else 'Кошик' }}</title>
     <style>
         body {
             background-color: #f5f7fa;
@@ -18,11 +18,14 @@
             padding: 30px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+        .image-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
         .image-box img {
             width: 100%;
             max-width: 400px;
             border-radius: 12px;
-            margin-bottom: 20px;
         }
         h2 {
             color: #1e2a53;
@@ -36,20 +39,36 @@
             text-align: center;
         }
         .btn {
-            padding: 12px 20px;
+            padding: 10px 18px;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
-        .add {
+        .btn-green {
             background-color: #28a745;
             color: white;
         }
-        .add:hover {
+        .btn-green:hover {
             background-color: #218838;
+        }
+        .btn-blue {
+            background-color: #3366cc;
+            color: white;
+        }
+        .btn-blue:hover {
+            background-color: #254b8a;
+        }
+        .btn-red {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-red:hover {
+            background-color: #b02a37;
         }
         .cart-item {
             border-bottom: 1px solid #ddd;
@@ -57,12 +76,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .cart-item:last-child {
             border-bottom: none;
         }
         .cart-info {
             flex: 1;
+            min-width: 200px;
         }
         .cart-actions {
             display: flex;
@@ -73,51 +95,42 @@
             width: 60px;
             padding: 5px;
             font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
         }
         .flash {
             color: green;
             text-align: center;
             margin-bottom: 15px;
+            font-weight: bold;
         }
-        .delete-link {
-            color: red;
-            text-decoration: none;
-        }
-        .delete-link:hover {
-            text-decoration: underline;
+        .empty-cart {
+            text-align: center;
+            color: #777;
+            font-style: italic;
         }
         .back-link {
             margin-top: 30px;
             text-align: center;
-        }
-        .back-link a {
-            text-decoration: none;
-            color: #3366cc;
-            font-weight: bold;
-        }
-        .back-link a:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
 
-        {% if product %}
+        {% if position %}
         <div class="image-box">
-            <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+            <img src="{{ url_for('static', filename='menu/' ~ position['file_name']) }}" alt="{{ position['name'] }}">
         </div>
-        <h2>{{ product['name'] }}</h2>
-        <p><strong>Інгредієнти:</strong> {{ product['description'] }}</p>
-        <p><strong>Ціна:</strong> {{ product['price'] }} грн</p>
+        <h2>{{ position['name'] }}</h2>
+        <p><strong>Інгредієнти:</strong> {{ position['description'] }}</p>
+        <p><strong>Ціна:</strong> {{ position['price'] }} грн</p>
 
         <div style="text-align:center; margin-bottom: 30px;">
-            <a href="{{ url_for('add_to_cart', product_id=product['id']) }}">
-                <button class="btn add">Додати до кошика</button>
-            </a>
+            <a href="{{ url_for('add_to_cart', position_id=position['id']) }}" class="btn btn-green">Додати до кошика</a>
         </div>
-        {% endif %}
 
+        {% else %}
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <div class="flash">
@@ -130,27 +143,28 @@
 
         <h2>Ваш кошик</h2>
         {% if cart %}
-            {% for product_id, item in cart.items() %}
+            {% for position_id, item in cart.items() %}
                 <div class="cart-item">
                     <div class="cart-info">
                         <strong>{{ item.name }}</strong><br>
                         {{ item.price }} грн × {{ item.quantity }}
                     </div>
                     <div class="cart-actions">
-                        <form action="{{ url_for('update_cart', product_id=product_id) }}" method="POST">
+                        <form action="{{ url_for('update_cart', position_id=position_id) }}" method="POST">
                             <input type="number" name="quantity" min="1" max="10" value="{{ item.quantity }}">
-                            <button type="submit">Оновити</button>
+                            <button type="submit" class="btn btn-blue">Оновити</button>
                         </form>
-                        <a class="delete-link" href="{{ url_for('delete_from_cart', product_id=product_id) }}">Видалити</a>
+                        <a href="{{ url_for('delete_from_cart', position_id=position_id) }}" class="btn btn-red">Видалити</a>
                     </div>
                 </div>
             {% endfor %}
         {% else %}
-            <p style="text-align:center;">Кошик порожній.</p>
+            <p class="empty-cart">Кошик порожній.</p>
+        {% endif %}
         {% endif %}
 
         <div class="back-link">
-            <a href="{{ url_for('menu') }}">← Назад до меню</a>
+            <a href="{{ url_for('menu') }}" class="btn btn-blue">← Назад до меню</a>
         </div>
     </div>
 </body>

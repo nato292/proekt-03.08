@@ -126,29 +126,29 @@ def position(name):
 @app.route("/cart")
 def cart():
     init_cart()
-    return render_template("position.html", products=None, cart=session["cart"])
+    return render_template("position.html", position=None, cart=session["cart"])
 
-@app.route("/cart/update/<product_id>", methods=["POST"])
-def update_cart(product_id):
+@app.route("/cart/update/<position_id>", methods=["POST"])
+def update_cart(position_id):
     init_cart()
     quantity = int(request.form.get("quantity", 1))
 
     if quantity < 1 or quantity > 10:
         flash("Кількість повинна бути від 1 до 10")
     else:
-        if product_id in session["cart"]:
-            session["cart"][product_id]["quantity"] = quantity
+        if position_id in session["cart"]:
+            session["cart"][position_id]["quantity"] = quantity
             flash("Кількість оновлено")
 
     session.modified = True
     return redirect(url_for("cart"))
 
 
-@app.route('/add_to_cart/<int:product_id>')
-def add_to_cart(product_id):
+@app.route('/add_to_cart/<int:position_id>')
+def add_to_cart(position_id):
     with Session() as db:
-        product = db.query(Menu).get(product_id)
-        if not product:
+        position = db.query(Menu).get(position_id)
+        if not position:
             flash("Товар не найден!", "error")
             return redirect(url_for('menu'))
 
@@ -157,25 +157,25 @@ def add_to_cart(product_id):
 
         cart = session['cart']
         for item in cart:
-            if item['id'] == product.id:
+            if item['id'] == position.id:
                 item['quantity'] += 1
                 break
         else:
             cart.append({
-                'id': product.id,
-                'name': product.name,
-                'price': product.price,
+                'id': position.id,
+                'name': position.name,
+                'price': position.price,
                 'quantity': 1
             })
 
         session['cart'] = cart
-        flash(f"{product.name} добавлено в корзину!", "success")
+        flash(f"{position.name} добавлено в корзину!", "success")
         return redirect(url_for('menu'))
 
-@app.route("/cart/delete/<product_id>")
-def delete_from_cart(product_id):
+@app.route("/cart/delete/<position_id>")
+def delete_from_cart(position_id):
     init_cart()
-    session["cart"].pop(product_id, None)
+    session["cart"].pop(position_id, None)
     flash("Товар видалено з кошика")
     session.modified = True
     return redirect(url_for("cart"))
