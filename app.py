@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from online_restaurant_db import Base, engine, Session, User, Menu, Orders, Reservation
+from online_restaurant_db import Base, engine, Session, Users, Menu, Orders, Reservation
 from flask_login import LoginManager, current_user, login_required, login_user
 import datetime
 import secrets
@@ -22,7 +22,7 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
     with Session() as session:
-        user = session.query(User).filter_by(id = user_id).first()
+        user = session.query(Users).filter_by(id = user_id).first()
         if user:
             return user
 
@@ -63,12 +63,12 @@ def register():
         password = request.form['password']
         email = request.form['email']
 
-        if session_db.query(User).filter_by(username=username).first():
+        if session_db.query(Users).filter_by(username=username).first():
             return "Користувач вже існує"
-        if session_db.query(User).filter_by(email=email).first():
+        if session_db.query(Users).filter_by(email=email).first():
             return "Пошта вже використовується"
 
-        new_user = User(username=username, password=password, email=email)
+        new_user = Users(username=username, password=password, email=email)
         session_db.add(new_user)
         session_db.commit()
         return redirect(url_for('login'))
@@ -82,7 +82,7 @@ def login():
         session_db = Session()
         username = request.form['username']
         password = request.form['password']
-        user = session_db.query(User).filter_by(username=username, password=password).first()
+        user = session_db.query(Users).filter_by(username=username, password=password).first()
         if user:
             session['user_id'] = user.id
             return redirect(url_for('home'))
@@ -286,7 +286,7 @@ def all_users():
         return redirect(url_for('home'))
 
     with Session() as cursor:
-        all_users = cursor.query(User).with_entities(User.id, User.nickname, User.email).all()
+        all_users = cursor.query(Users).with_entities(Users.id, Users.nickname, Users.email).all()
     return render_template('all_users.html', all_users=all_users)
 
 @app.route('/orders_check', methods=['GET', 'POST'])
