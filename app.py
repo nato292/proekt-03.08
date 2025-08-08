@@ -104,7 +104,7 @@ def position(name):
             return "Запит заблоковано!", 403
 
         position_name = request.form.get('name')
-        position_num = request.form.get('num')
+        position_num = request.form.get('num') 
         if 'cart' not in session:
             basket = {}
             basket[position_name] = position_num
