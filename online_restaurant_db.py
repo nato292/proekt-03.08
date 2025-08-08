@@ -13,16 +13,18 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 # Fallback для локального запуску (опціонально)
 if not DATABASE_URL:
     PGUSER = "postgres"
-    PGPASSWORD = "ilya2012"
-    DATABASE_URL = f"postgresql+psycopg2://{PGUSER}:{PGPASSWORD}@localhost:5432/proekt_db"
+    PGPASSWORD = "21022004"
+    DATABASE_URL = f"postgresql+psycopg2://{PGUSER}:{PGPASSWORD}@localhost:5432/restaurant_illia"
 
 engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
-
 # Базовий клас для моделей
 class Base(DeclarativeBase):
     def create_db(self):
         Base.metadata.create_all(engine)
+
+    def drop_db(self):
+        Base.metadata.drop_all(engine)
 
 class Users(Base, UserMixin):
     __tablename__ = "users"
@@ -69,11 +71,10 @@ class Orders(Base):
 
     user = relationship("Users", foreign_keys="Orders.user_id", back_populates="orders")
 
-# Base.metadata.drop_all(engine)
-# Base.metadata.create_all(engine)
-
 base = Base()
 base.create_db()
+
+
 
 
 
