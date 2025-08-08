@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <title>Додати страву</title>
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            color: #273c75;
+        }
+        form {
+            background: #fff;
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 30px 25px 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(44, 62, 80, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        input[type="file"] {
+            padding: 10px 12px;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        input[type="file"]:focus {
+            border: 1.5px solid #4078c0;
+            outline: none;
+        }
+        button[type="submit"] {
+            background: #4078c0;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 0;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background: #274b7a;
+        }
+    </style>
+</head>
+<body>
+    <h2>Додати нову страву</h2>
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_menu') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <input type="text" name="name" placeholder="Назва страви" required>
+
+        <input type="number" name="weight" placeholder="Вага (г)" min="1" required>
+
+        <textarea name="ingredients" placeholder="Інгредієнти" required></textarea>
+
+        <textarea name="description" placeholder="Опис страви" required></textarea>
+
+        <input type="number" name="price" placeholder="Ціна" min="0" step="0.01" required>
+
+        <input type="file" name="photo" accept="image/*" required>
+
+        <button type="submit">Додати</button>
+    </form>
+</body>
+</html>
