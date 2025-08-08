@@ -829,3 +829,180 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 
+########################################################### нова менюха
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Меню</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h2 {
+            text-align: center;
+            color: #1e2a53;
+            margin-bottom: 40px;
+        }
+        .menu-item {
+            background-color: white;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .menu-item img {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-right: 20px;
+        }
+        .menu-info h3 {
+            margin: 0 0 8px;
+        }
+        .menu-info p {
+            margin: 0 0 10px;
+            color: #555;
+        }
+        .menu-info a {
+            color: #3366cc;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .menu-info a:hover {
+            text-decoration: underline;
+        }
+        .back-button-wrapper {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3366cc;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-button:hover {
+            background-color: #254b8a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Наше меню</h2>
+        {% for product in products %}
+        <div class="menu-item">
+            <img src="{{ url_for('static', filename='images/' ~ (product.file_name or 'no_image.jpg')) }}" alt="{{ product.name }}">
+            <div class="menu-info">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.description }}</p>
+                <a href="{{ url_for('position', id=product.id) }}">Оглядати детальніше</a>
+                <a href="{{ url_for('add_to_cart', product_id=product.id) }}">Додати в кошик</a>
+            </div>
+        </div>
+        {% else %}
+        <p>Меню наразі порожнє.</p>
+        {% endfor %}
+        <div class="back-button-wrapper">
+            <a href="{{ url_for('home') }}" class="back-button">На головну сторінку</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+################################################################ стара менюха 
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Меню</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h2 {
+            text-align: center;
+            color: #1e2a53;
+            margin-bottom: 40px;
+        }
+        .menu-item {
+            background-color: white;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .menu-item img {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-right: 20px;
+        }
+        .menu-info h3 {
+            margin: 0 0 8px;
+        }
+        .menu-info p {
+            margin: 0 0 10px;
+            color: #555;
+        }
+        .menu-info a {
+            color: #3366cc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .menu-info a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Наше меню</h2>
+        {% for product in products %}
+        <div class="menu-item">
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            <div class="menu-info">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.description }}</p>
+                <a href="{{ url_for('position', id=product.id) }}">Оглядати детальніше</a>
+                <a href="{{ url_for('add_to_cart', product_id=product.id) }}">Додати в кошик</a>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="back-button-wrapper">
+            <a href="{{ url_for('home') }}" class="back-button">На головну сторінку</a>
+        </div>
+    </div>
+</body>
+</html>
