@@ -64,23 +64,23 @@
     </style>
 </head>
 <body>
-    <h2>Додати нову страву</h2>
-    <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_menu') }}">
+    <h2>Додавання нової страви</h2>
+    <form method="post" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-
-        <input type="text" name="name" placeholder="Назва страви" required>
-
-        <input type="number" name="weight" placeholder="Вага (г)" min="1" required>
-
-        <textarea name="ingredients" placeholder="Інгредієнти" required></textarea>
-
-        <textarea name="description" placeholder="Опис страви" required></textarea>
-
-        <input type="number" name="price" placeholder="Ціна" min="0" step="0.01" required>
-
-        <input type="file" name="photo" accept="image/*" required>
-
-        <button type="submit">Додати</button>
+        <label>Назва:</label><br>
+        <input type="text" name="name" required><br><br>
+        <label>Вага:</label><br>
+        <input type="text" name="weight" required><br><br>
+        <label>Інгредієнти:</label><br>
+        <input type="text" name="ingredients" required><br><br>
+        <label>Опис:</label><br>
+        <textarea name="description" required></textarea><br><br>
+        <label>Ціна:</label><br>
+        <input type="number" name="price" required><br><br>
+        <label>Фото страви:</label><br>
+    <input type="file" name="photo" accept="image/*" required><br><br>
+        <button type="submit">Додати страву</button>
     </form>
+    <br>
 </body>
 </html>
