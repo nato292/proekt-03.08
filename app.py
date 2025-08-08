@@ -261,7 +261,7 @@ def add_menu():
 
 @app.route('/menu_check', methods=['GET', 'POST'])
 @login_required
-def menu_check(request):
+def menu_check():
     if current_user.nickname != 'Admin':
         return redirect(url_for('home'))
 
