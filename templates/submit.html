@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Оформлення замовлення</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #1e2a53;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input, textarea {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-green {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-green:hover {
+            background-color: #218838;
+        }
+        .back-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .empty-cart {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Оформлення замовлення</h2>
+
+        {% if not cart %}
+            <p class="empty-cart">Кошик порожній.</p>
+            <div class="back-link">
+                <a href="{{ url_for('menu') }}" class="btn btn-green">← Назад до меню</a>
+            </div>
+        {% else %}
+        <form method="POST">
+            <input type="text" name="name" placeholder="Ваше ім'я" required>
+            <input type="tel" name="phone" placeholder="Номер телефону" required>
+            <textarea name="address" placeholder="Адреса доставки" rows="3" required></textarea>
+            <button type="submit" class="btn btn-green">Підтвердити замовлення</button>
+        </form>
+
+        <div class="back-link">
+            <a href="{{ url_for('cart') }}" class="btn btn-green">← Повернутися до кошика</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

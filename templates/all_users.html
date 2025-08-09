@@ -1,20 +1,76 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Усі користувачі</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 100%;
+            overflow-x: auto;
+        }
+        h2 {
+            color: #1e2a53;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+        }
+        th {
+            background-color: #f0f4ff;
+            font-weight: 600;
+            color: #1e2a53;
+        }
+        tr:nth-child(even) {
+            background-color: #fafbff;
+        }
+    </style>
 </head>
 <body>
-<h2>Користувачі</h2>
-<table>
-    <tr><th>ID</th><th>Нікнейм</th><th>Email</th></tr>
-    {% for user in all_users %}
-    <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.nickname }}</td>
-        <td>{{ user.email }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="container">
+        <h2>Користувачі</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Нікнейм</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in all_users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.nickname }}</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

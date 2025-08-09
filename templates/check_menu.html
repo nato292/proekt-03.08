@@ -1,30 +1,117 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Адміністрування меню</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            width: 100%;
+            overflow-x: auto;
+        }
+        h2 {
+            color: #1e2a53;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            table-layout: fixed;
+            word-wrap: break-word;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f0f4ff;
+            font-weight: 600;
+            color: #1e2a53;
+        }
+        tr:nth-child(even) {
+            background-color: #fafbff;
+        }
+        form button {
+            background-color: #3366cc;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            border: none;
+            padding: 8px 12px;
+            margin: 2px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form button[name="change_status"]:hover {
+            background-color: #254aa5;
+        }
+        form button[name="delete_position"] {
+            background-color: #dc3545;
+        }
+        form button[name="delete_position"]:hover {
+            background-color: #b02a37;
+        }
+    </style>
 </head>
 <body>
-<h2>Перевірка меню</h2>
-<table>
-    <tr><th>ID</th><th>Назва</th><th>Опис</th><th>Ціна</th><th>Активний</th><th>Дія</th></tr>
-    {% for pos in all_positions %}
-    <tr>
-        <td>{{ pos.id }}</td>
-        <td>{{ pos.name }}</td>
-        <td>{{ pos.description }}</td>
-        <td>{{ pos.price }}</td>
-        <td>{{ "Так" if pos.active else "Ні" }}</td>
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                <input type="hidden" name="pos_id" value="{{ pos.id }}">
-                <button type="submit" name="change_status">Змінити статус</button>
-                <button type="submit" name="delete_position">Видалити</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="container">
+        <h2>Перевірка меню</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>Опис</th>
+                    <th>Ціна</th>
+                    <th>Активний</th>
+                    <th>Дія</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pos in all_positions %}
+                <tr>
+                    <td>{{ pos.id }}</td>
+                    <td>{{ pos.name }}</td>
+                    <td>{{ pos.description }}</td>
+                    <td>{{ pos.price }}</td>
+                    <td>{{ "Так" if pos.active else "Ні" }}</td>
+                    <td>
+                        <form method="post" style="display:inline-block;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="pos_id" value="{{ pos.id }}">
+                            <button type="submit" name="change_status">Змінити статус</button>
+                        </form>
+                        <form method="post" style="display:inline-block;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="pos_id" value="{{ pos.id }}">
+                            <button type="submit" name="delete_position" onclick="return confirm('Видалити цю позицію?');">Видалити</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

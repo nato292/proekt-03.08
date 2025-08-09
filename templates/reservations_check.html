@@ -3,32 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <title>Перевірка бронювань</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+        h2 {
+            color: #1e2a53;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+        }
+        th {
+            background-color: #f0f4ff;
+            font-weight: 600;
+            color: #1e2a53;
+        }
+        tr:nth-child(even) {
+            background-color: #fafbff;
+        }
+        form button {
+            background-color: #dc3545;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form button:hover {
+            background-color: #b02a37;
+        }
+    </style>
 </head>
 <body>
-<h2>Перевірка бронювань</h2>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Час</th>
-        <th>Тип столика</th>
-        <th>Користувач</th>
-        <th>Дія</th>
-    </tr>
-    {% for res in all_reservations %}
-    <tr>
-        <td>{{ res.id }}</td>
-        <td>{{ res.time_start }}</td>
-        <td>{{ res.type_table }}</td>
-        <td>{{ res.user.nickname }}</td>
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                <input type="hidden" name="reserv_id" value="{{ res.id }}">
-                <button type="submit">Видалити</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="container">
+        <h2>Перевірка бронювань</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Час</th>
+                    <th>Тип столика</th>
+                    <th>Користувач</th>
+                    <th>Дія</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in all_reservations %}
+                <tr>
+                    <td>{{ res.id }}</td>
+                    <td>{{ res.time_start }}</td>
+                    <td>{{ res.type_table }}</td>
+                    <td>{{ res.user.nickname }}</td>
+                    <td>
+                        <form method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="reserv_id" value="{{ res.id }}">
+                            <button type="submit">Видалити</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

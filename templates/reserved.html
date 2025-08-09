@@ -3,21 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <title>Бронювання столика</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            margin-bottom: 30px;
+            color: #1e2a53;
+        }
+        form p {
+            text-align: left;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e2a53;
+        }
+        select, input[type="datetime-local"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button, .btn-home {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: white;
+        }
+        button {
+            background-color: #3366cc;
+            margin-bottom: 15px;
+        }
+        button:hover {
+            background-color: #254aa5;
+        }
+        .btn-home {
+            background-color: #28a745;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-home:hover {
+            background-color: #218838;
+        }
+        .success-message {
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Бронювання столика</h2>
+    <div class="container">
+        <h2>Бронювання столика</h2>
 
-    <form method="post">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        {% if success %}
+            <p class="success-message">Успішно заброньовано!</p>
+        {% endif %}
 
-        <p>Оберіть тип столика</p>
-        <select name="table_type">
-            <option value="1-2">1-2 людини</option>
-            <option value="3-4">3-4 людини</option>
-            <option value="4+">Більше 4-х людей</option>
-        </select>
-        <input type="datetime-local" name="time" required>
-        <button type="submit">Забронювати</button>
-    </form>
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <p>Оберіть тип столика</p>
+            <select name="table_type">
+                <option value="1-2">1-2 людини</option>
+                <option value="3-4">3-4 людини</option>
+                <option value="4+">Більше 4-х людей</option>
+            </select>
+            <input type="datetime-local" name="time" required>
+            <button type="submit">Забронювати</button>
+        </form>
+
+        <a href="/" class="btn-home">← Назад на головну</a>
+    </div>
 </body>
 </html>

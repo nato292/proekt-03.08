@@ -1,22 +1,105 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Деталі замовлення</title>
+    <meta charset="UTF-8" />
+    <title>Деталі замовлення №{{ order.id }}</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+        h2 {
+            color: #1e2a53;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+        li {
+            background-color: #f0f4ff;
+            margin-bottom: 10px;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        strong {
+            color: #1e2a53;
+        }
+        form {
+            text-align: center;
+            margin-top: 30px;
+        }
+        button, .btn-back {
+            background-color: #dc3545;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        button:hover, .btn-back:hover {
+            background-color: #b02a37;
+        }
+        .btn-back {
+            background-color: #3366cc;
+            margin-left: 10px;
+        }
+        .btn-back:hover {
+            background-color: #254b8a;
+        }
+        .buttons-wrapper {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Ваше замовлення №{{ order.id }}</h2>
-    <p>Перелік позицій:</p>
-    <ul>
-        {% for name, quantity in order.order_list.items() %}
-            <li>{{ name }} — кількість: {{ quantity }}</li>
-        {% endfor %}
-    </ul>
-    <p><strong>Дата та час:</strong> {{ order.order_time }}</p>
-    <p><strong>Загальна сума:</strong> {{ total_price }} грн</p>
+    <div class="container">
+        <h2>Ваше замовлення №{{ order.id }}</h2>
+        <p>Перелік позицій:</p>
+        <ul>
+            {% for name, quantity in order.order_list.items() %}
+                <li>{{ name }} — кількість: {{ quantity }}</li>
+            {% endfor %}
+        </ul>
+        <p><strong>Дата та час:</strong> {{ order.order_time }}</p>
+        <p><strong>Загальна сума:</strong> {{ total_price }} грн</p>
 
-    <form method="post" action="/cancel_order/{{ order.id }}">
-        <button type="submit">Скасувати замовлення</button>
-    </form>
+        <div class="buttons-wrapper">
+            <form method="post" action="/cancel_order/{{ order.id }}" style="display:inline;">
+                <button type="submit">Скасувати замовлення</button>
+            </form>
+            <a href="{{ url_for('home') }}" class="btn-back">Повернутися на головну</a>
+        </div>
+    </div>
 </body>
 </html>

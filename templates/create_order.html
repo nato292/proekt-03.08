@@ -1,95 +1,85 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Оформлення замовлення</title>
     <style>
         body {
             background-color: #f5f7fa;
             font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            margin: 0;
         }
-
         .container {
             background-color: white;
-            padding: 40px;
+            padding: 30px 40px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
             width: 100%;
-            max-width: 500px;
-            text-align: center;
         }
-
-        h2 {
+        h1 {
             color: #1e2a53;
-            margin-bottom: 30px;
+            text-align: center;
+            margin-bottom: 25px;
         }
-
         ul {
             list-style: none;
             padding: 0;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
-
         li {
             background-color: #f0f4ff;
             margin-bottom: 10px;
-            padding: 10px 15px;
+            padding: 12px 18px;
             border-radius: 8px;
             font-weight: 500;
+            font-size: 16px;
         }
-
-        .total {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 30px;
+        form {
+            text-align: center;
         }
-
-        form button {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
+        input[type="submit"] {
             background-color: #28a745;
             color: white;
-            font-size: 16px;
             font-weight: bold;
+            font-size: 16px;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-
-        form button:hover {
+        input[type="submit"]:hover {
             background-color: #218838;
         }
-
-        a.back-link {
-            display: block;
-            margin-top: 20px;
-            color: #3366cc;
-            text-decoration: none;
-        }
-
-        a.back-link:hover {
-            text-decoration: underline;
+        .empty-message {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Ваше замовлення</h2>
+    {% if cart %}
         <ul>
-            {% for item in cart %}
-                <li>{{ item.name }} — {{ item.quantity }} × {{ item.price }} грн</li>
+            {% for position in cart %}
+                <li>{{ position }} , к-сть: {{ cart[position] }}</li>
             {% endfor %}
         </ul>
-        <div class="total">Загалом: {{ total }} грн</div>
-        <form method="post" action="/submit_order">
-            <button type="submit">Підтвердити замовлення</button>
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="submit" value="Оформити замовлення">
         </form>
-        <a class="back-link" href="/menu">← Назад до меню</a>
+    {% else %}
+        <h1 class="empty-message">Ваш список замовлень пустий</h1>
+    {% endif %}
     </div>
 </body>
 </html>

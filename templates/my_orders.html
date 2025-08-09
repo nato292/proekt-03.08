@@ -1,14 +1,87 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Мої замовлення</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+        h2 {
+            color: #1e2a53;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .order-item {
+            background-color: #f0f4ff;
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-info {
+            color: #333;
+        }
+        .order-date {
+            font-weight: 500;
+            color: #666;
+        }
+        .btn-view {
+            background-color: #3366cc;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-view:hover {
+            background-color: #254b8a;
+        }
+        .no-orders {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            font-size: 18px;
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Ваші замовлення</h2>
-    {% for order in us_orders %}
-        <p>Замовлення #{{ order.id }} від {{ order.order_time }}</p>
-        <button><a href="/my_order/{{ order.id }}">Переглянути деталі</a></button>
-    {% endfor %}
+    <div class="container">
+        <h2>Ваші замовлення</h2>
+        {% if us_orders %}
+            {% for order in us_orders %}
+                <div class="order-item">
+                    <div class="order-info">
+                        Замовлення №{{ order.id }}<br>
+                        <span class="order-date">{{ order.order_time }}</span>
+                    </div>
+                    <a href="{{ url_for('my_order', id=order.id) }}" class="btn-view">Переглянути деталі</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-orders">У вас поки що немає замовлень.</p>
+        {% endif %}
+    </div>
 </body>
 </html>

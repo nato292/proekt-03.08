@@ -1,9 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from online_restaurant_db import Base, engine, Session, Users, Menu, Orders, Reservation
 from flask_login import LoginManager, current_user, login_required, login_user
-import datetime
+from datetime import datetime
 import secrets
 import os
+now = datetime.now()
+
+
 
 app = Flask(__name__)
 
@@ -153,22 +156,25 @@ def add_to_cart(position_id):
             return redirect(url_for('menu'))
 
         if 'cart' not in session:
-            session['cart'] = []
+            session['cart'] = {}
 
         cart = session['cart']
-        for item in cart:
-            if item['id'] == position.id:
-                item['quantity'] += 1
-                break
+
+        key = str(position.id)
+
+        if key in cart:
+            cart[key]['quantity'] += 1
         else:
-            cart.append({
+            cart[key] = {
                 'id': position.id,
                 'name': position.name,
                 'price': position.price,
                 'quantity': 1
-            })
+            }
 
         session['cart'] = cart
+        session.modified = True
+
         flash(f"{position.name} добавлено в корзину!", "success")
         return redirect(url_for('menu'))
 
@@ -205,6 +211,25 @@ def create_order():
 
     return render_template('create_order.html', csrf_token=session["csrf_token"], cart=cart)
 
+@app.route("/submit_order", methods=["GET", "POST"])
+def submit_order():
+    if request.method == "POST":
+        name = request.form.get("name")
+        phone = request.form.get("phone")
+        address = request.form.get("address")
+        cart = session.get("cart", {})
+
+        if not cart:
+            flash("Кошик порожній, не можна оформити замовлення.")
+            return redirect(url_for("cart"))
+
+
+        flash("Ваше замовлення прийнято! Очікуйте дзвінок оператора.")
+        session["cart"] = {}
+        return redirect(url_for("menu"))
+
+    return render_template("submit.html", cart=session.get("cart", {}))
+
 
 @app.route('/my_orders')
 @login_required
@@ -218,9 +243,32 @@ def my_orders():
 def my_order(id):
     with Session() as cursor:
         us_order = cursor.query(Orders).filter_by(id=id).first()
-        total_price = sum(int(cursor.query(Menu).filter_by(name=i).first().price) * int(cnt) for i, cnt in us_order.order_list.items())
+        if not us_order:
+            flash("Замовлення не знайдено", "error")
+            return redirect(url_for("menu"))
+
+        total_price = 0
+        for position_id_str, item in us_order.order_list.items():
+            position_id = int(position_id_str)
+            menu_item = cursor.query(Menu).get(position_id)
+            if menu_item:
+                total_price += menu_item.price * item['quantity']
+
     return render_template('my_order.html', order=us_order, total_price=total_price)
 
+@app.route('/cancel_order/<int:order_id>', methods=['POST'])
+@login_required
+def cancel_order(order_id):
+    with Session() as db:
+        order = db.query(Orders).filter_by(id=order_id, user_id=current_user.id).first()
+        if not order:
+            flash("Замовлення не знайдено або доступ заборонено", "error")
+            return redirect(url_for('menu'))
+
+        db.delete(order)
+        db.commit()
+        flash("Ваше замовлення скасовано", "success")
+    return redirect(url_for('home'))
 
 ############################### ADMINKA
 
